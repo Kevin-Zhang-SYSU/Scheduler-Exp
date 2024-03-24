@@ -1,0 +1,2 @@
+time="2024-03-24 00:44:34" level=info msg="Hello, World!" func=main.main file="/home/k8s-master/zy-test/scheduler-exp/main.go:10"
+time="2024-03-24 00:44:55" level=info msg="Hello, World!" func=main.main file="/home/k8s-master/zy-test/scheduler-exp/main.go:10"
