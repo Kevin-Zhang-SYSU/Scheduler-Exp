@@ -98,11 +98,24 @@ func CreateDeployment(userName string, taskSubmitInfo model.TaskSubmitInfo) erro
 	util.Logger.Debug("Creating deployment ... ... ...")
 	result, err := deploymentsClient.Create(context.TODO(), deployment, metav1.CreateOptions{})
 	if err != nil {
-		util.Logger.Error("Failed to create deployment %q: %v", deployment.GetObjectMeta().GetName(), err)
+		util.Logger.Errorf("Failed to create deployment %q: %v", deployment.GetObjectMeta().GetName(), err)
 		return err
 	}
-	util.Logger.Debug("Created deployment %q.", result.GetObjectMeta().GetName())
+	util.Logger.Debugf("Created deployment %q.", result.GetObjectMeta().GetName())
 	return nil
+}
+
+// 获取一个Deployment
+func GetDeployment(deploymentName string) *appsv1.Deployment {
+	namespace := "default"
+	deployment, err := ClientSet.AppsV1().Deployments(namespace).Get(context.TODO(), deploymentName, metav1.GetOptions{})
+	if err != nil {
+		util.Logger.Errorf("Failed to get deployment %q: %v", deploymentName, err)
+		return nil
+	} else {
+		util.Logger.Debugf("Get deployment %q.", deploymentName)
+		return deployment
+	}
 }
 
 // 删除一个Deployment
@@ -110,10 +123,10 @@ func DeleteDeployment(deploymentName string) error {
 	namespace := "default"
 	err := ClientSet.AppsV1().Deployments(namespace).Delete(context.TODO(), deploymentName, metav1.DeleteOptions{})
 	if err != nil {
-		util.Logger.Error("Failed to delete deployment %q: %v", deploymentName, err)
+		util.Logger.Errorf("Failed to delete deployment %q: %v", deploymentName, err)
 		return err
 	} else {
-		util.Logger.Debug("Deleted deployment %q.", deploymentName)
+		util.Logger.Debugf("Deleted deployment %q.", deploymentName)
 		return nil
 	}
 }

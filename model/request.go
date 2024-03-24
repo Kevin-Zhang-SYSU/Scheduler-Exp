@@ -47,3 +47,13 @@ type DeploymentModel struct {
 	CreatedAt  time.Time
 	UpdatedAt  time.Time
 }
+
+type GPUInfo struct {
+	Name         string `json:"name"`
+	IPAddress    string `json:"ipAddress"`
+	GPU0         string `json:"gpu0"`
+	GPU1         string `json:"gpu1"`
+	GPU2         string `json:"gpu2"`
+	GPU3         string `json:"gpu3"`
+	GPUMemoryGiB string `json:"gpuMemoryGiB"`
+}
