@@ -84,7 +84,7 @@ func CheckResource(GpuRequest int) bool {
 		return false
 	}
 	for _, gpuInfo := range gpuInfoList {
-		util.Logger.Debug(gpuInfo.Name, "has gpus: ", gpuInfo.GPU0, gpuInfo.GPU1, gpuInfo.GPU2, gpuInfo.GPU3)
+		util.Logger.Debugln(gpuInfo.Name, "has gpus:", gpuInfo.GPU0, gpuInfo.GPU1, gpuInfo.GPU2, gpuInfo.GPU3)
 		for _, gpu := range []string{gpuInfo.GPU0, gpuInfo.GPU1, gpuInfo.GPU2, gpuInfo.GPU3} {
 			if gpu == "0/0" {
 				continue

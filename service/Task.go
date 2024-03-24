@@ -51,10 +51,21 @@ func CreateTask(userName string, taskSubmitInfo model.TaskSubmitInfo) (bool, err
 }
 
 // 查找Task是否已经存在
-func CheckTask(userName string, taskSubmitInfo model.TaskSubmitInfo) (bool, error) {
+func CheckTask(userName string, taskName string) (bool, error) {
 	// 查找Task是否已经存在
-	if k8s.GetDeployment(userName+"-"+taskSubmitInfo.TaskName) != nil {
+	if k8s.GetDeployment(userName+"-"+taskName) != nil {
 		return true, nil
 	}
 	return false, nil
+}
+
+// 删除Task
+func DeleteTask(userName, taskName string) error {
+	// 删除Task
+	err := k8s.DeleteDeployment(userName + "-" + taskName)
+	if err != nil {
+		util.Logger.Error("Failed to delete deployment")
+		return err
+	}
+	return nil
 }
