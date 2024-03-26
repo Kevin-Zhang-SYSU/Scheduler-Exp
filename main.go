@@ -37,7 +37,7 @@ func generateTask(index int) Task {
 func createTask(taskList []Task) {
 	// 循环taskNum次，每次从taskMap中取出一个任务，每次相隔5秒
 	for i := 0; i < len(taskList); i++ {
-		time.Sleep(5 * time.Second)
+		time.Sleep(2 * time.Second)
 		taskName := taskList[i].taskName
 		gpumem := taskList[i].gpumem
 		util.Logger.Debugf("taskName: %s, gpumem: %d", taskName, gpumem)
@@ -72,7 +72,7 @@ func deleteTask(taskList []Task) {
 		if !taskList[i].exist {
 			continue
 		}
-		time.Sleep(3 * time.Second)
+		time.Sleep(2 * time.Second)
 		taskName := taskList[i].taskName
 		err := service.DeleteTask("exp", taskName)
 		if err != nil {

@@ -2,9 +2,14 @@
 package service
 
 import (
+	"context"
+	"fmt"
 	"scheduler-exp/k8s"
 	"scheduler-exp/model"
 	"scheduler-exp/util"
+	"time"
+
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 var taskSubmitInfo = model.TaskSubmitInfo{
@@ -53,12 +58,24 @@ func CreateTask(userName string, taskSubmitInfo model.TaskSubmitInfo) (bool, err
 // 查找Task是否已经存在
 func CheckTask(userName string, taskName string) (string, error) {
 	// 查找Task是否已经存在
-	deploy := k8s.GetDeployment(userName + "-" + taskName)
+	time.Sleep(3 * time.Second)
+	deploymentName := userName + "-" + taskName
+	deploy := k8s.GetDeployment(deploymentName)
 	if deploy != nil {
-		// 找到deploy对应的node名字
-		nodeName := deploy.Spec.Template.Spec.NodeName
+		// 找到deploy对应的pod
+		// 获取指定名称的Deployment的所有Pod
+		pods, err := k8s.ClientSet.CoreV1().Pods("").List(context.Background(), metav1.ListOptions{
+			LabelSelector: fmt.Sprintf("task=%s", deploymentName),
+		})
+		if err != nil {
+			panic(err.Error())
+		}
+		pod := pods.Items[0]
+		nodeName := pod.Spec.NodeName
+		util.Logger.Info("Task exists on node ", nodeName)
 		return nodeName, nil
 	}
+	util.Logger.Error("Deploy not found")
 	return "", nil
 }
 
