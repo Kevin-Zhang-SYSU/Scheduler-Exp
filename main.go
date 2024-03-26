@@ -92,7 +92,7 @@ func deleteTask(taskList []Task) {
 
 func main() {
 	fmt.Println("This is the scheduler experiment system")
-	var taskNum int = 20
+	var taskNum int = 2
 	taskList := make([]Task, taskNum)
 
 	// 生成任务列表
@@ -114,6 +114,10 @@ func main() {
 	for i, task := range taskList {
 		fmt.Printf("Task %d: %+v\n", i, task)
 	}
+	// 程序阻塞，要求用户输入任意字符
+	fmt.Println("Press Enter to delete tasks...")
+	fmt.Scanln()
+
 	// 删除任务
 	fmt.Println("Begin delete task ... ... ...")
 	deleteTask(taskList)
