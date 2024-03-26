@@ -13,6 +13,7 @@ type Task struct {
 	taskName string
 	gpumem   int
 	exist    bool
+	node     string
 	info     string
 }
 
@@ -27,6 +28,7 @@ func generateTask(index int) Task {
 		taskName: taskName,
 		gpumem:   gpumem,
 		exist:    false,
+		node:     "",
 		info:     "",
 	}
 	return task
@@ -52,13 +54,14 @@ func createTask(taskList []Task) {
 			taskList[i].info = "Insufficient resources"
 		}
 		// 检查任务是否存在
-		exist, err := service.CheckTask(userName, taskName)
+		nodeName, err := service.CheckTask(userName, taskName)
 		if err != nil {
 			util.Logger.Errorf("Failed to check task %s", taskName)
 		}
-		if exist {
+		if nodeName != "" {
 			util.Logger.Infof("Task %s exists", taskName)
 			taskList[i].exist = true
+			taskList[i].node = nodeName
 		}
 	}
 }
@@ -76,11 +79,11 @@ func deleteTask(taskList []Task) {
 			util.Logger.Errorf("Failed to delete task %s", taskName)
 		}
 		// 检查任务是否存在
-		exist, err := service.CheckTask(userName, taskName)
+		nodeName, err := service.CheckTask(userName, taskName)
 		if err != nil {
 			util.Logger.Errorf("Failed to check task %s", taskName)
 		}
-		if !exist {
+		if nodeName == "" {
 			util.Logger.Infof("Task %s exists", taskName)
 			taskList[i].exist = false
 		}

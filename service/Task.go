@@ -51,12 +51,15 @@ func CreateTask(userName string, taskSubmitInfo model.TaskSubmitInfo) (bool, err
 }
 
 // 查找Task是否已经存在
-func CheckTask(userName string, taskName string) (bool, error) {
+func CheckTask(userName string, taskName string) (string, error) {
 	// 查找Task是否已经存在
-	if k8s.GetDeployment(userName+"-"+taskName) != nil {
-		return true, nil
+	deploy := k8s.GetDeployment(userName + "-" + taskName)
+	if deploy != nil {
+		// 找到deploy对应的node名字
+		nodeName := deploy.Spec.Template.Spec.NodeName
+		return nodeName, nil
 	}
-	return false, nil
+	return "", nil
 }
 
 // 删除Task
