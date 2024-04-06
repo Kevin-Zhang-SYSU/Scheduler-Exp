@@ -49,13 +49,13 @@ func parseGPUInfo(input string) ([]model.GPUInfo, error) {
 	return gpuInfoList, nil
 }
 
-// 终端执行kubectl inspect gpushare, 获取输出并解析为json，返回给前端
-func GetGPU() {
+// 终端执行kubectl inspect gpushare
+func GetGPU() []model.GPUInfo {
 	cmd := exec.Command("kubectl", "inspect", "gpushare")
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		util.Logger.Error("Failed to execute kubectl inspect gpushare")
-		return
+		return nil
 	}
 
 	gpuInfoList, err := parseGPUInfo(string(output))
@@ -68,7 +68,18 @@ func GetGPU() {
 	for _, gpuInfo := range gpuInfoList {
 		util.Logger.Debug(gpuInfo.Name, "has gpus: ", gpuInfo.GPU0, gpuInfo.GPU1, gpuInfo.GPU2, gpuInfo.GPU3)
 	}
+	return gpuInfoList
+}
 
+// 计算集群的GPU内存利用率
+func Com_GPU_MEM() {
+	gpuInfoList := GetGPU()
+	for _, gpuInfo := range gpuInfoList {
+		used, total := strings.Split(gpuInfo.GPUMemoryGiB, "/")[0], strings.Split(gpuInfo.GPUMemoryGiB, "/")[1]
+		usedNum, err := strconv.Atoi(used)
+		totalNum, err := strconv.Atoi(total)
+	}
+	return
 }
 
 // 检查集群资源是否满足要求

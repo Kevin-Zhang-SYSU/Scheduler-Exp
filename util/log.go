@@ -27,7 +27,7 @@ func init() {
 	multiWriter := io.MultiWriter(src, os.Stdout)
 
 	Logger.Out = multiWriter
-	Logger.SetLevel(logrus.DebugLevel)
+	Logger.SetLevel(logrus.InfoLevel)
 	Logger.SetReportCaller(true)
 	Logger.SetFormatter(&logrus.TextFormatter{
 		DisableColors:   true,
