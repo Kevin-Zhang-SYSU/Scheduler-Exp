@@ -42,7 +42,7 @@ func Create_taskSubmitInfo(taskName string, gpumem int) *model.TaskSubmitInfo {
 
 func CreateTask(userName string, taskSubmitInfo model.TaskSubmitInfo) (bool, error) {
 	// // 将信息通过日志输出到控制台
-	util.Logger.Info("Create task ", taskSubmitInfo.TaskName, "with gpu ", taskSubmitInfo.Gpu)
+	util.Logger.Infoln("Create task ", taskSubmitInfo.TaskName, " with gpu ", taskSubmitInfo.Gpu)
 	if !CheckResource(taskSubmitInfo.Gpu) {
 		util.Logger.Error("Insufficient resources")
 		return false, nil

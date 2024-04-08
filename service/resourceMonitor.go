@@ -71,15 +71,26 @@ func GetGPU() []model.GPUInfo {
 	return gpuInfoList
 }
 
-// 计算集群的GPU内存利用率
-func Com_GPU_MEM() {
+// 计算集群内每个节点的GPU内存利用率，以字典形式返回
+func GetNodeGPUUsage() map[string]float64 {
+	nodeusagedict := make(map[string]float64)
 	gpuInfoList := GetGPU()
 	for _, gpuInfo := range gpuInfoList {
 		used, total := strings.Split(gpuInfo.GPUMemoryGiB, "/")[0], strings.Split(gpuInfo.GPUMemoryGiB, "/")[1]
 		usedNum, err := strconv.Atoi(used)
 		totalNum, err := strconv.Atoi(total)
+		if err != nil {
+			util.Logger.Error("Failed to convert string to int")
+		}
+		// 计算GPU内存利用率,保留两位小数
+		nodeusagedict[gpuInfo.Name] = float64(usedNum) / float64(totalNum)
+		// usage := float64(usedNum) / float64(totalNum)
+		// usageStr := fmt.Sprintf("%.2f", usage)
+
+		// // 将使用率存储到字典中
+		// nodeusagedict[gpuInfo.Name] = usageStr
 	}
-	return
+	return	nodeusagedict
 }
 
 // 检查集群资源是否满足要求

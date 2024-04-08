@@ -9,6 +9,7 @@ import (
 	"scheduler-exp/util"
 	"syscall"
 	"time"
+	"sort"
 )
 
 // Task 结构体
@@ -18,6 +19,7 @@ type Task struct {
 	exist    bool
 	node     string
 	info     string
+	nodeGpuUsage map[string]float64
 }
 
 var userName string = "exp"
@@ -36,8 +38,44 @@ func generateTask(index int) Task {
 		exist:    false,
 		node:     "",
 		info:     "",
+		nodeGpuUsage: make(map[string]float64),
 	}
 	return task
+}
+
+// 将task写入CSV文件
+func toCSV(taskList []Task) {
+	// 创建文件
+	file, err := os.Create("task-default-extender-1.csv")
+	if err != nil {
+		util.Logger.Error("Failed to create file")
+	}
+	defer file.Close()
+
+	// 写入标题
+	file.WriteString("taskName,gpumem,exist,node,info")
+
+	keys := make([]string, 0, len(taskList[0].nodeGpuUsage))
+	for nodeName := range taskList[0].nodeGpuUsage {
+		keys = append(keys, nodeName)
+	}
+
+	// 对键进行排序
+	sort.Strings(keys)
+
+	for _, nodeName := range keys {
+		file.WriteString(fmt.Sprintf(",%s", nodeName))
+	}
+
+	file.WriteString("\n")
+	// 写入数据
+	for _, task := range taskList {
+		file.WriteString(fmt.Sprintf("%s,%d,%t,%s,%s", task.taskName, task.gpumem, task.exist, task.node, task.info))
+		for _, nodeName := range keys {
+			file.WriteString(fmt.Sprintf(",%f", task.nodeGpuUsage[nodeName]))
+		}
+		file.WriteString("\n")
+	}
 }
 
 func createTask(taskList []Task, stop <-chan struct{}) {
@@ -63,6 +101,7 @@ func createTask(taskList []Task, stop <-chan struct{}) {
 				util.Logger.Infof("Task %s created successfully", taskName)
 			} else {
 				taskList[i].info = "Insufficient resources"
+				taskList[i].nodeGpuUsage = service.GetNodeGPUUsage()
 			}
 			// 检查任务是否存在
 			nodeName, err := service.CheckTask(userName, taskName)
@@ -73,6 +112,7 @@ func createTask(taskList []Task, stop <-chan struct{}) {
 				util.Logger.Infof("Task %s exists", taskName)
 				taskList[i].exist = true
 				taskList[i].node = nodeName
+				taskList[i].nodeGpuUsage = service.GetNodeGPUUsage()
 			}
 		}
 	}
@@ -104,7 +144,7 @@ func deleteTask(taskList []Task) {
 
 func main() {
 	fmt.Println("This is the scheduler experiment system")
-	var taskNum int = 30
+	var taskNum int = 60
 	taskList := make([]Task, taskNum)
 
 	// 生成任务列表
@@ -149,6 +189,9 @@ func main() {
 	for i, task := range taskList {
 		fmt.Printf("Task %d: %+v\n", i, task)
 	}
+	// 将任务信息写入CSV文件
+	toCSV(taskList)
+
 	// 程序阻塞，要求用户输入任意字符
 	fmt.Println("Press Enter to delete tasks...")
 	fmt.Scanln()
